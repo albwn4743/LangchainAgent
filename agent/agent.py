@@ -1,56 +1,64 @@
-from langchain_groq import ChatGroq
-from langchain_core.prompts import ChatPromptTemplate
-import os
-from dotenv import load_dotenv
+from prompt import prompts
+from modelConfig import llm
+from memory import user_message, ai_message,full_history
+from langchain.agents import create_agent
+from banking_tools import get_interest, bank_FAQs,calculate_emi,bank_names,general_banking_faq,card_types_faq,loan_details_faq
 
-load_dotenv()
+tools = [
+    get_interest,
+    bank_FAQs,
+    calculate_emi,
+    bank_names,
+    general_banking_faq,
+    loan_details_faq,
+    card_types_faq
+]
 
+agent = create_agent(model=llm, tools=tools,system_prompt=prompts)
 
-llm = ChatGroq(
-    model='llama-3.3-70b-versatile',
-    temperature = 0.2,
-    api_key=os.getenv('GROQ_API_KEY')
-)
-
-history = []
-
-prompt = ChatPromptTemplate.from_template(
-'''
-You are a banking assistant.
-Rules:
-1. Answer Only banking related questions and you may answer questions about your role and capabilities.
-2.Banking TOpics include:
-    -Savings Accounts
-    -Current accounts
-    -loans
-    -credit cards
-    -FIxed Deposits
-    -Debit Cards
-    -Interest Rated
-    -Banking Regualtions
-    -Digital Banking
-3.If the question is not related to banking, then respond with:
-'Sorry, i am a banking assitant. I only answer banking related questions.'
-4.If the question is like "WHo are you" then respond with:
-'Am a banking assitant. I will help you for the banking related queries.'
-Question:{question}
-history:{chat_history}
-'''
-)
-
-chain = prompt | llm
+# agent_executor = AgentExecutor(agent=agent,tools=tools)
 
 while True:
-    query = input('Ask a Question:')
+    question = input("\nQuestion:")
+    user_message(question)
+    try:
+        response = agent.invoke(
+            {
+                'messages':full_history()
+            }
+        )
+        
+        answer = response['messages'][-1].content
+    
+        print("\nAgent:", answer)
+        ai_message(answer)
+    except Exception as e:
+        print('Error', e)
 
-    if query.lower() == 'exit':
-        break
+    
 
-    response = chain.invoke({
-        'question':query,
-        'chat_history':history
-    })
 
-    print('\nAnswer : ')
-    print(response.content)
-    history.append(response.content)
+
+# chain = prompts | llm
+# while True:
+#     query=input("Question:")
+#     if query.lower() == 'exit':
+#         break
+#     check_knowledge = retrieve_context(query)
+#     if check_knowledge:
+#         # print('Answer:',check_knowledge)
+
+#         user_message(query)
+#         ai_message(check_knowledge)
+#     #     continue
+#     response = chain.invoke({
+#         'query':query,
+#         'history':full_history(),
+#         'context':check_knowledge
+#     })
+
+
+#     print('Bot:',response.content)
+
+#     user_message(query)
+#     ai_message(response.content)
