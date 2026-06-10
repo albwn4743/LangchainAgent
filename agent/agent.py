@@ -3,15 +3,16 @@ from langchain_core.prompts import ChatPromptTemplate
 import os
 from dotenv import load_dotenv
 
-# print(os.path.exists('.env'))
 load_dotenv()
-print(os.path.exists('.env'))
-# print()
+
+
 llm = ChatGroq(
     model='llama-3.3-70b-versatile',
     temperature = 0.2,
     api_key=os.getenv('GROQ_API_KEY')
 )
+
+history = []
 
 prompt = ChatPromptTemplate.from_template(
 '''
@@ -33,6 +34,7 @@ Rules:
 4.If the question is like "WHo are you" then respond with:
 'Am a banking assitant. I will help you for the banking related queries.'
 Question:{question}
+history:{chat_history}
 '''
 )
 
@@ -45,8 +47,10 @@ while True:
         break
 
     response = chain.invoke({
-        'question':query
+        'question':query,
+        'chat_history':history
     })
 
     print('\nAnswer : ')
     print(response.content)
+    history.append(response.content)
