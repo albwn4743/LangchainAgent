@@ -1,12 +1,16 @@
-from langchain_core.messages import HumanMessage, AIMessage
-
 history = []
 
 def user_message(message):
-    history.append(HumanMessage(content=message))
+    history.append({
+        'role':'user',
+        'content':message
+    })
 
 def ai_message(message):
-    history.append(AIMessage(content=message))
+    history.append({
+        'role':'assistant',
+        "content":message
+    })
 
 def full_history():
     return history
