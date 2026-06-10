@@ -31,9 +31,9 @@ def bank_details(question):
     for name,data in bank_data.items():
         if name in question:
             if 'fd' in question or 'fixed deposit' in question:
-                return data['fixed_deposit_interest']
+                return f"{name} FD intrest rate is:{data['fixed_deposit_interest']}"
             if 'savings' in question:
-                return data['savings_account_interest']
+                return f"{name} Savings interest rate is:{data['savings_account_interest']}"
             if 'home loan' in question:
-                return data['home_loan_interest']
+                return f"{name} Home loan interest is:{data['home_loan_interest']}"
     return None

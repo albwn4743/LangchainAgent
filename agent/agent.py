@@ -13,14 +13,15 @@ while True:
         break
     check_knowledge = bank_details(query)
     if check_knowledge:
-        print('Answer:',check_knowledge)
+        # print('Answer:',check_knowledge)
 
         user_message(query)
         ai_message(check_knowledge)
-        continue
+    #     continue
     response = chain.invoke({
         'query':query,
-        'history':full_history()
+        'history':full_history(),
+        'context':check_knowledge
     })
 
 

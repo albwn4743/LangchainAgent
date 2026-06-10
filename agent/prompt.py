@@ -6,6 +6,8 @@ prompts = ChatPromptTemplate.from_messages([
         '''
 You are a banking assistant.
 Rules:
+check this context too.{context}
+
 1. Answer Only banking related questions and you may answer questions about your role and capabilities.
 2.Banking TOpics include:
     -Savings Accounts
