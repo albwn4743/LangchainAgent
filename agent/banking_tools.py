@@ -29,20 +29,6 @@ def calculate_emi(principal:float,annual_rate:float,years:int):
 
 
 @tool
-def bank_FAQs(query:str):
-    '''
-    Answers banking questions
-    '''
-    query = query.lower()
-    if 'faq' in query:
-        return bank_facts
-
-    for key, value in bank_facts.items():
-        if key in query:
-            return value
-    return 'information not available.'
-
-@tool
 def bank_names(query:str):
     '''
     about the bank names
