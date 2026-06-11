@@ -27,13 +27,14 @@ graph.add_conditional_edges(
     router,
     {
         'banking':'banking',
-        'search':'search'
+        'search':'search',
+        'end':END
     }
 )
 
 graph.add_edge(
     'banking',
-    END
+    'supervisor'
 )
 
 graph.add_edge(

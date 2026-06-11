@@ -15,12 +15,12 @@ def web_search(question:str):
     Use for insurance policies, latest rates, latest bank products,
     and any information unavailable in local banking tools.
     """
-    print("web search is using")
+    # print("web search is using")
     response = tavily.invoke(question)
     output= []
     for i in response['results']:
         output.append(
-            f"title:{i['title'][:350]}\n"
+            f"title:{i['title'][:300]}\n"
             f"Content:{i['content']}"
         )
     return '\n\n'.join(output)

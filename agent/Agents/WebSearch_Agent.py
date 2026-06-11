@@ -9,6 +9,7 @@ tools = [
 ]
 prompt = ChatPromptTemplate.from_messages([
     ("system", search_prompt),
+    MessagesPlaceholder(variable_name="messages"),
     ("human", "{input}"),
     MessagesPlaceholder(variable_name="agent_scratchpad"),
 ])

@@ -1,13 +1,12 @@
 # from nodes.SupervisorAgent import supervisor
 from graph.workflow import app
-from memory import user_message,ai_message,full_history
+from memory import user_message,ai_message
 while True:
     question = input("\nQuestion:")
     try:
         response = app.invoke(
             {
-                'question':question,
-                'messages':full_history()[-6:]
+                'question':question
             }
         )
         

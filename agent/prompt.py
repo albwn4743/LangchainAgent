@@ -55,6 +55,6 @@ be concise, professional, and accurate.
 search_prompt = '''
 you are a web search assistant.
 you only searches banking related informations.
-if anything other than banking sector then just simply return ' i dont know the answer well'
+if anything other than banking sector then just simply return 'i am only trained for Banking related questions, ask about such questions'
 
 '''

@@ -1,11 +1,11 @@
 from Agents.BaseAgent import banking_executor
-
+from memory import full_history
 def banking_node(state):
 
     response = banking_executor.invoke(
         {
             "input": state["question"],
-            "messages": state.get("messages", [])
+            "messages": full_history()[-6:]
         }
     )
 
