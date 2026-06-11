@@ -135,7 +135,6 @@ def loan_details_faq(query: str):
 
     query = query.lower()
 
-    # Match longer phrases first
     for key in sorted(
         loan_details.keys(),
         key=len,
