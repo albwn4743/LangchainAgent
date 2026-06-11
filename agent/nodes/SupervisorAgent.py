@@ -5,16 +5,16 @@ def supervisor(state):
 decide which agent should answer.
 Available agents are;
     -bankagent.
-    -web search agent.
+    -search.
 
 question: {state['question']}
 
 return only:
-    -bankagent
-    -web search agent.
+    banking or search
 '''
 
     route = llm.invoke(prompt).content.strip()
+    print("route: ",route)
     return {
         'route':route
     }
