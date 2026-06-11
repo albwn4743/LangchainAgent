@@ -1,4 +1,4 @@
-from langchain.tools import tool
+from langchain_core.tools import tool
 from knowledge import (
     bank_data,
     banks,
@@ -121,12 +121,6 @@ def bank_names(query: str):
 
     return "No matching bank found."
 
-def bank_names(query:str):
-    '''
-    about the bank names
-    '''
-    return banks
-
 @tool
 def loan_details_faq(query: str):
     """
@@ -181,15 +175,7 @@ def card_types_faq(query: str):
 
 @tool
 def general_banking_faq(query: str):
-    """
-    Answers general banking questions.
-
-    Examples:
-    - What is ATM?
-    - What is deposit?
-    - What is withdrawal?
-    - Show all FAQs
-    """
+    '''Use this tool for ALL banking definitions like ATM, withdrawal, deposit, interest, loans.'''
 
     query = query.lower()
 
@@ -201,9 +187,9 @@ def general_banking_faq(query: str):
         key=len,
         reverse=True
     ):
-        if key in query:
+        if key in query or query in key:
             return (
-                f"topic: {key}",
+                f"topic: {key}\n"
                 f"answer: {general_banking_facts[key]}"
             )
 
