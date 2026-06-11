@@ -14,12 +14,12 @@ bank_data = {
         'savings_account_interest':'3.00%',
         'home_loan_interest':'8.80%'
     },
-    'federal bank':{
+    'federal':{
         'fixed_deposit_interest': '6.50%',
         'savings_account_interest':'2.40%',
         'home_loan_interest':'9.50%'
     },
-    'canara bank':{
+    'canara':{
         'fixed_deposit_interest': '5.80%',
         'savings_account_interest':'3.70%',
         'home_loan_interest':'6.50%'

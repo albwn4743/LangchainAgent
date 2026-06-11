@@ -1,78 +1,215 @@
 from langchain.tools import tool
-from knowledge import bank_data, banks,loan_details,card_types,general_banking_facts
-@tool
-def get_interest(bank_name:str):
-    '''
-    returns FD interest rate for a bank
-    '''
-    bank_name = bank_name.lower()
-    context = []
-    for bank,data in bank_data.items():
-        if bank in bank_name:
-            context.append(f"bank:{bank}")
+from knowledge import (
+    bank_data,
+    banks,
+    loan_details,
+    card_types,
+    general_banking_facts,
+)
 
-            for key,value in bank_data.items():
-                context.append(f'{key}:{value}')
-        return ','.join(context)
 
-@tool
-def calculate_emi(principal:float,annual_rate:float,years:int):
-    '''
-    calculate EMI.
-    '''
-    rate = annual_rate/ (12*100)
-    nper = years*12
+BANK_ALIASES = {
+    "state bank of india": "sbi",
+    "sbi": "sbi",
+    "hdfc bank": "hdfc",
+    "hdfc": "hdfc",
+    "icici bank": "icici",
+    "icici": "icici",
+    "federal bank": "federal",
+    "federal": "federal",
+    "canara bank": "canara",
+    "canara": "canara",
+}
 
-    emi = (principal*rate*(1+rate)**nper)/((1+rate)**nper-1)
-
-    return round(emi,2)
 
 
 @tool
-def bank_names(query:str):
-    '''
-    about the bank names
-    '''
-    return banks
+def bank_interest_rates(bank_name: str)->str:
+    """
+    Get all interest rates for a given bank.
+
+    Examples:
+    - sbi
+    - state bank of india
+    - hdfc
+    - hdfc bank
+    - icici
+    - federal bank
+    - canara bank
+    """
+
+    query = bank_name.lower().strip()
+
+    matched_bank = None
+
+    for alias, bank_code in BANK_ALIASES.items():
+        if alias in query:
+            matched_bank = bank_code
+            break
+
+    if not matched_bank:
+        return {"error": "Bank not found"}
+
+    data = bank_data.get(matched_bank)
+
+    return (
+    f"Bank: {matched_bank}\n"
+    f"FD Interest: {data['fixed_deposit_interest']}\n"
+    f"Savings Interest: {data['savings_account_interest']}\n"
+    f"Home Loan Interest: {data['home_loan_interest']}"
+)
+
+
+
+@tool
+def calculate_emi(principal: float, annual_rate: float, years: int):
+    """
+    Calculate EMI (Equated Monthly Installment).
+
+    Args:
+        principal: Loan amount
+        annual_rate: Annual interest rate in %
+        years: Loan tenure in years
+
+    Example:
+        calculate_emi(1000000, 8.5, 20)
+    """
+
+    rate = annual_rate / (12 * 100)
+    nper = years * 12
+
+    if rate == 0:
+        emi = principal / nper
+    else:
+        emi = (
+            principal
+            * rate
+            * (1 + rate) ** nper
+            / ((1 + rate) ** nper - 1)
+        )
+
+    return {
+        "principal": principal,
+        "annual_rate": annual_rate,
+        "years": years,
+        "monthly_emi": round(emi, 2),
+    }
+
+
+
+@tool
+def bank_names(query: str):
+    """
+    Search available bank names.
+
+    Examples:
+    - sbi
+    - federal
+    - kerala
+    - indian
+    """
+
+    query = query.lower().strip()
+
+    if not query:
+        return banks
+
+    matches = [
+        bank
+        for bank in banks
+        if query in bank.lower()
+    ]
+
+    if matches:
+        return matches
+
+    return "No matching bank found."
+
 
 @tool
 def loan_details_faq(query: str):
     """
     Answers questions related to loans.
+
+    Examples:
+    - What is a home loan?
+    - Explain EMI
+    - What is collateral?
+    - What is CIBIL score?
     """
+
     query = query.lower()
 
-    for key, value in loan_details.items():
+    # Match longer phrases first
+    for key in sorted(
+        loan_details.keys(),
+        key=len,
+        reverse=True
+    ):
         if key in query:
-            return value
+            return {
+                "topic": key,
+                "answer": loan_details[key]
+            }
 
-    return "Loan information not available."
+    return {
+        "error": "Loan information not available."
+    }
+
 
 @tool
 def card_types_faq(query: str):
     """
-    Answers questions related to debit cards, credit cards and card networks.
+    Answers questions related to debit cards,
+    credit cards, RuPay, Visa, Mastercard, etc.
     """
+
     query = query.lower()
 
-    for key, value in card_types.items():
+    for key in sorted(
+        card_types.keys(),
+        key=len,
+        reverse=True
+    ):
         if key in query:
-            return value
+            return {
+                "topic": key,
+                "answer": card_types[key]
+            }
 
-    return "Card information not available."
+    return {
+        "error": "Card information not available."
+    }
+
 
 @tool
 def general_banking_faq(query: str):
     """
-    Answers general banking questions such as bank, ATM, account, deposit, withdrawal, etc.
+    Answers general banking questions.
+
+    Examples:
+    - What is ATM?
+    - What is deposit?
+    - What is withdrawal?
+    - Show all FAQs
     """
+
     query = query.lower()
 
     if "all" in query or "faq" in query:
         return general_banking_facts
 
-    for key, value in general_banking_facts.items():
+    for key in sorted(
+        general_banking_facts.keys(),
+        key=len,
+        reverse=True
+    ):
         if key in query:
-            return value
+            return {
+                "topic": key,
+                "answer": general_banking_facts[key]
+            }
 
-    return "General banking information not available."
+    return {
+        "error": "General banking information not available."
+    }
