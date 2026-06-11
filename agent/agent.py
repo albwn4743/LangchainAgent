@@ -1,18 +1,22 @@
 from prompt import prompts
 from modelConfig import llm
 from memory import user_message, ai_message,full_history
+from langchain_core.prompts import MessagesPlaceholder,ChatPromptTemplate
 from langchain.agents import create_agent
-from banking_tools import get_interest, bank_FAQs,calculate_emi,bank_names,general_banking_faq,card_types_faq,loan_details_faq
+from banking_tools import bank_interest_rates,calculate_emi,bank_names,general_banking_faq,card_types_faq,loan_details_faq
 
 tools = [
-    get_interest,
-    bank_FAQs,
+    bank_interest_rates,
     calculate_emi,
     bank_names,
     general_banking_faq,
     loan_details_faq,
     card_types_faq
 ]
+prompt = ChatPromptTemplate.from_messages([
+    ('system',prompts),
+    MessagesPlaceholder(variable_name='messages')
+])
 
 agent = create_agent(model=llm, tools=tools,system_prompt=prompts)
 
