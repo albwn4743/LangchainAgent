@@ -125,6 +125,11 @@ def bank_names(query: str):
 
     return "No matching bank found."
 
+def bank_names(query:str):
+    '''
+    about the bank names
+    '''
+    return banks
 
 @tool
 def loan_details_faq(query: str):
