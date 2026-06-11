@@ -1,5 +1,6 @@
 from prompt import prompts
 from modelConfig import llm
+from search import web_search
 from memory import user_message, ai_message,full_history
 from langchain_core.prompts import MessagesPlaceholder,ChatPromptTemplate
 # from langchain.agents import create_tool
@@ -13,7 +14,8 @@ tools = [
     bank_names,
     general_banking_faq,
     loan_details_faq,
-    card_types_faq
+    card_types_faq,
+    web_search
 ]
 prompt = ChatPromptTemplate.from_messages([
     ('system',prompts),
@@ -30,6 +32,7 @@ agent = create_tool_calling_agent(
 agent_executor = AgentExecutor(
     agent=agent,
     tools=tools,
+    verbose=True
 )
 
 while True:
