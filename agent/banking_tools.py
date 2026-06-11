@@ -66,7 +66,7 @@ def calculate_emi(principal: float, annual_rate: float, years: int):
     """
     Calculate EMI (Equated Monthly Installment).
 
-    Args:
+    Arguments:
         principal: Loan amount
         annual_rate: Annual interest rate in %
         years: Loan tenure in years
@@ -81,19 +81,15 @@ def calculate_emi(principal: float, annual_rate: float, years: int):
     if rate == 0:
         emi = principal / nper
     else:
-        emi = (
-            principal
-            * rate
-            * (1 + rate) ** nper
-            / ((1 + rate) ** nper - 1)
-        )
+        emi = principal * rate * (1 + rate) ** nper / ((1 + rate) ** nper - 1)
 
-    return {
-        "principal": principal,
-        "annual_rate": annual_rate,
-        "years": years,
-        "monthly_emi": round(emi, 2),
-    }
+    return (
+    f"EMI Calculation:\n"
+    f"Principal: {principal}\n"
+    f"Annual Rate: {annual_rate}%\n"
+    f"Years: {years}\n"
+    f"Monthly EMI: {round(emi, 2)}"
+)
 
 
 
@@ -152,14 +148,12 @@ def loan_details_faq(query: str):
         reverse=True
     ):
         if key in query:
-            return {
-                "topic": key,
-                "answer": loan_details[key]
-            }
+            return (
+                f"topic: {key}\n"
+                f"answer: {loan_details[key]}"
+            )
 
-    return {
-        "error": "Loan information not available."
-    }
+    return 'Not Found'
 
 
 @tool
@@ -177,14 +171,12 @@ def card_types_faq(query: str):
         reverse=True
     ):
         if key in query:
-            return {
-                "topic": key,
-                "answer": card_types[key]
-            }
+            return (
+                f"topic: {key}\n"
+                f"answer: {card_types[key]}\n"
+            )
 
-    return {
-        "error": "Card information not available."
-    }
+    return 'Not Found'
 
 
 @tool
@@ -210,11 +202,9 @@ def general_banking_faq(query: str):
         reverse=True
     ):
         if key in query:
-            return {
-                "topic": key,
-                "answer": general_banking_facts[key]
-            }
+            return (
+                f"topic: {key}",
+                f"answer: {general_banking_facts[key]}"
+            )
 
-    return {
-        "error": "General banking information not available."
-    }
+    return 'Not found'

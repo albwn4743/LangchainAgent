@@ -20,7 +20,6 @@ prompt = ChatPromptTemplate.from_messages([
 
 agent = create_agent(model=llm, tools=tools,system_prompt=prompts)
 
-# agent_executor = AgentExecutor(agent=agent,tools=tools)
 
 while True:
     question = input("\nQuestion:")
@@ -28,7 +27,7 @@ while True:
     try:
         response = agent.invoke(
             {
-                'messages':full_history()
+                'messages':full_history()[-6:]
             }
         )
         
@@ -37,32 +36,8 @@ while True:
         print("\nAgent:", answer)
         ai_message(answer)
     except Exception as e:
-        print('Error', e)
+        print("I dont have the prior information for that")
 
     
 
 
-
-# chain = prompts | llm
-# while True:
-#     query=input("Question:")
-#     if query.lower() == 'exit':
-#         break
-#     check_knowledge = retrieve_context(query)
-#     if check_knowledge:
-#         # print('Answer:',check_knowledge)
-
-#         user_message(query)
-#         ai_message(check_knowledge)
-#     #     continue
-#     response = chain.invoke({
-#         'query':query,
-#         'history':full_history(),
-#         'context':check_knowledge
-#     })
-
-
-#     print('Bot:',response.content)
-
-#     user_message(query)
-#     ai_message(response.content)
