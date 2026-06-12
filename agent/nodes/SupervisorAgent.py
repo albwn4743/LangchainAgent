@@ -18,6 +18,7 @@ Available routes:
 - 'end': Choose this ONLY if we already have a valid, helpful answer in the 'Current Answer' field below (which means one of the agents has just answered the current question). Do NOT choose 'end' if the 'Current Answer'
  field is empty, not set, or is an error message.
 
+ before choosing a route check the conversation history. If any thing related is find then please answer from there.if not then choose the routes
 Conversation History:{history}
 Question: {question}
 Current Answer: {current_answer}
@@ -29,7 +30,7 @@ CRITICAL RULE 2: If the user's question refers to previous topics, banks, or det
 Respond with ONLY one word from the available routes: banking, search, not_banking, or end. Do not include any other text.
 '''
     route = llm.invoke(prompt).content.strip()
-    # print("route: ",route)
+    print("route: ",route)
     if 'not_banking' in route:
         return {'route':'end','answer':'its not a banking sector question'}
     elif 'end' in route:

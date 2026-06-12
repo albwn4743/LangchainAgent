@@ -8,4 +8,5 @@ def ai_message(message):
     history.append(AIMessage(content=message))
 
 def full_history():
+    # print(history)
     return history
