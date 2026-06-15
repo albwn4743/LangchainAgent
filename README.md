@@ -47,11 +47,12 @@ The assistant only answers using information regarding the banking sector, it us
    * Search Agent for general information queries.
    * Not Banking for questions related to domains other than banking.
 4. If it is a banking agent then, the agent invokes the appropriate retrieval tool to access the knowledge base.
-5. If the answer is not present in the Banking agent, it will use the route: search for using the web search.
-6. Relevant information is retrieved and provided as context to the Groq LLM.
-5. The assistant generates a response using the retrieved information.
-6. The final response is returned to the user.
+5. If the answer is not present in the Banking agent, it will use the route: 'search' for using the web search.
+6. Playwright opens Chrome and searches for a relevant website containing the required information.
+7. The relevant information is scraped and provided as context to the Groq LLM.
+8. The assistant generates a response using the retrieved information.
+9. The final response is returned to the user.
+
 
 ## Note
-
 The assistant relies on the provided knowledge base, tool outputs and Web Search. If query is not banking related, it will indicate that verified information is unavailable instead of generating unsupported answers.

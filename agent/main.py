@@ -12,7 +12,6 @@ while True:
             }
         )
         )
-        
         answer = response['answer']
     
         print("\nAgent:", answer)
