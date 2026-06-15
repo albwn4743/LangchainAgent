@@ -39,21 +39,13 @@ async def search_and_scrape(query:str):
             print(await page.title())
             print(page.url)
 
-            results = page.locator("h3")
+            results = page.locator("a:has(h3)")
             count = await results.count()
             print(f"\nFound {count} results\n")
             result_urls = []
             for i in range(min(count, 5)):
                 try:
-                    # title = await results.nth(i).inner_text()
-                    anchor = results.nth(i).locator(
-                        "xpath=ancestor::a[1]"
-                    )
-                    url = await anchor.get_attribute("href")
-                    # print(f"{i+1}. {title}")
-                    # print(url)
-                    # print("-" * 60)
-
+                    url = await results.nth(i).get_attribute("href")
                     if url and url.startswith("http"):
                         result_urls.append(url)
 
@@ -74,7 +66,7 @@ async def search_and_scrape(query:str):
                 wait_until="domcontentloaded"
             )
 
-            await page.wait_for_timeout(3000)
+            # await page.wait_for_timeout(3000)
             text = await page.locator(
                 "body"
             ).inner_text()

@@ -1,9 +1,9 @@
 from langchain_classic.agents import create_tool_calling_agent,AgentExecutor
 from modelConfig import llm
 from prompt import search_prompt
-from tools.search import web_search
+# from tools.search import web_search
 from langchain_core.prompts import MessagesPlaceholder,ChatPromptTemplate
-from webscrap import search_and_scrape
+from tools.webscrap import search_and_scrape
 
 tools = [
     search_and_scrape

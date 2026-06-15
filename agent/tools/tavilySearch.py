@@ -1,3 +1,6 @@
+
+#I didn't used this code file in this project yet
+'''
 from langchain_tavily import TavilySearch
 from langchain_core.tools import tool
 from dotenv import load_dotenv
@@ -24,3 +27,4 @@ def web_search(question:str):
             f"Content:{i['content']}"
         )
     return '\n\n'.join(output)
+    '''
