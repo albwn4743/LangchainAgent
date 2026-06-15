@@ -8,13 +8,13 @@ This project uses:
 
 * LangChain
 * LangGraph
-* Tavily
+* playwright
 * Groq LLM
 * Custom Tools
 * Banking Knowledge Base
 
 The Groq language model analyzes the user's question, selects the appropriate tool, retrieves information from the knowledge base, and generates a response.
-If the answer is not present in the Knowledge base. it will search the web for the appropriate answer and generates a response based on the result provided by tavily.
+If the answer is not available in the knowledge base, the system searches the web for relevant information, scrapes the content from trusted sources, and generates an appropriate response based on the retrieved data.
 
 The assistant only answers using information regarding the banking sector, it uses the knowledge base and web to generate the answer. It does not generate bank-specific information on its own.
 
@@ -27,14 +27,14 @@ The assistant only answers using information regarding the banking sector, it us
 * Supported Bank Information
 * EMI Calculation
 * Conversation Memory
-* Web Search using Tavily.
+* Web Automation using Playwright
 
 ## Technologies Used
 
 * Python
 * LangChain
 * LangGraph
-* Tavily
+* Playwright
 * Groq AI
 * Custom Tool Calling
 
@@ -42,9 +42,10 @@ The assistant only answers using information regarding the banking sector, it us
 
 1. User asks a banking-related question.
 2. The question is passed to the Supervisor agent.
-3. The router in supervisor agent decides which route is to be used for the answer. Shown below are the two different routes.
-   -Banking Agent for banking-related questions.
-   -Search Agent for general information queries.
+3. The router in the Supervisor Agent decides which route should be used to answer the user's query. The different routes are shown below:
+   * Banking Agent for banking-related questions.
+   * Search Agent for general information queries.
+   * Not Banking for questions related to domains other than banking.
 4. If it is a banking agent then, the agent invokes the appropriate retrieval tool to access the knowledge base.
 5. If the answer is not present in the Banking agent, it will use the route: search for using the web search.
 6. Relevant information is retrieved and provided as context to the Groq LLM.

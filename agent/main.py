@@ -1,13 +1,16 @@
 # from nodes.SupervisorAgent import supervisor
 from langgraph.workflow import app
 from memory import user_message,ai_message
+import asyncio
 while True:
     question = input("\nQuestion:")
     try:
-        response = app.invoke(
+        response = asyncio.run(
+            app.ainvoke(
             {
                 'question':question
             }
+        )
         )
         
         answer = response['answer']
