@@ -23,6 +23,7 @@ Conversation History:{history}
 Question: {question}
 Current Answer: {current_answer}
 
+if answer is get from banking please generate the answer instead of calling the banking agent multiple times.
 Analyze the state and conversation history carefully.
 CRITICAL RULE 1: If the 'Current Answer' field is empty, you must NOT choose 'end'. You must choose 'banking', 'search', or 'not_banking' to get an answer generated.
 CRITICAL RULE 2: If the user's question refers to previous topics, banks, or details from the Conversation History (e.g., using pronouns like 'this', 'that', 'they', or asking follow-up questions like 'which bank you

@@ -2,6 +2,9 @@
 from langgraph.workflow import app
 from memory import user_message,ai_message
 import asyncio
+from nodes.bank_node import initialize_agent
+
+asyncio.run(initialize_agent())
 while True:
     question = input("\nQuestion:")
     try:

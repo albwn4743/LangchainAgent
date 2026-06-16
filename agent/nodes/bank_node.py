@@ -1,8 +1,17 @@
-from Agents.BaseAgent import banking_executor
+from Agents.BaseAgent import create_base_agent
 from memory import full_history
-def banking_node(state):
+banking_executor = None
+
+async def initialize_agent():
+
+    global banking_executor
+
+    banking_executor = await create_base_agent()
+
+async def banking_node(state):
+    banking_executor = await create_base_agent()
     try:
-        response = banking_executor.invoke(
+        response = await banking_executor.ainvoke(
             {
                 "input": state["question"],
                 "messages": full_history()[-6:]
