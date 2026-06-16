@@ -33,7 +33,7 @@ async def search_and_scrape(query:str):
             await page.keyboard.press("Enter")
             await page.wait_for_url("**/search?*")
 
-            await page.locator("h3").first.wait_for(timeout=30000)
+            await page.locator("h3").first.wait_for(timeout=100000)
 
             print("\nSearch Page:")
             print(await page.title())

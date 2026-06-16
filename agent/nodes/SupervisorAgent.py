@@ -2,6 +2,7 @@ from modelConfig import llm
 from memory import full_history
 def supervisor(state):
     current_answer = state.get('answer','')
+    # print(current_answer)
     question = state['question']
     history = full_history()
     prompt = f'''

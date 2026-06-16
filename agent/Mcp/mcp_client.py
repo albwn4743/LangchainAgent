@@ -5,7 +5,7 @@ async def get_mcp_tools():
         {
             'financial':{
                 'command':'python',
-                'args':['agent/mcpServer.py'],
+                'args':['agent/Mcp/mcpServer.py'],
                 'transport':'stdio',
             }
         }

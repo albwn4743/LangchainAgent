@@ -1,22 +1,37 @@
 from langchain_core.tools import tool
 import re
 from knowledge import (
+    NOT_FOUND,
     bank_data,
-    banks,
     loan_details,
     card_types,
     general_banking_facts,
 )
-def _normalize(text: str) -> str:
-    """Lowercase, strip punctuation, collapse whitespace."""
-    return re.sub(r'\s+', ' ', re.sub(r'[^\w\s]', '', text.lower())).strip()
+def _resolve_bank(query: str) -> str | None:
+    """Return the canonical bank key for *query*, or None if not found."""
+    q = query.lower().strip()
+    for key, data in bank_data.items():
+        for alias in data.get("aliases", []):
+            if alias in q or q in alias:
+                return key
+    # Fallback: direct key match
+    if q in bank_data:
+        return q
+    return None
 
-def _match_key(query_clean: str, keys) -> str | None:
-    """Return the longest key whose words all appear in the query."""
-    for key in sorted(keys, key=len, reverse=True):
-        key_words = key.split()
-        if all(w in query_clean.split() for w in key_words):
-            return key
+def _match_keyword_entry(query: str, knowledge: dict) -> tuple[str, dict] | None:
+    """
+    Return the (topic, entry) whose keywords best match *query*.
+    Tries longest-key match first to avoid false positives on short keys.
+    """
+    q = query.lower().strip()
+    # Sort by length of key descending so more specific keys match first
+    for topic in sorted(knowledge.keys(), key=len, reverse=True):
+        entry = knowledge[topic]
+        keywords = entry.get("keywords", [topic])
+        for kw in sorted(keywords, key=len, reverse=True):
+            if kw in q:
+                return topic, entry
     return None
 
 
@@ -74,74 +89,87 @@ def bank_interest_rates(bank_name: str)->str:
 
 
 @tool
-def bank_names(query: str):
+def loan_details_faq(query: str) -> str:
     """
-    Search available bank names.
+    Answer questions about loan types and banking loan terminology.
 
-    Examples:
-    - sbi
-    - federal
-    - kerala
-    - indian
-    - list all banks
+    Handles: home loan, personal loan, education loan, gold loan, car loan,
+    EMI, principal, collateral, mortgage, overdraft, credit score, CIBIL, NPA.
+
+    Example inputs:
+    - "What is a home loan?"
+    - "Explain EMI"
+    - "What is CIBIL score?"
+    - "What does NPA mean?"
     """
-    clean = _normalize(query)
-
-    # Handle "list all" / "show all" intent
-    if not clean or any(w in clean.split() for w in ["all", "list", "show"]):
-        return banks
-
-    matches = [b for b in banks if any(w in b for w in clean.split())]
-    return matches if matches else "No matching bank found."
-
-@tool
-def loan_details_faq(query: str):
-    """
-    Answers questions related to loans.
-    Trigger words: loan, emi,principal,collateral,mortgage,overdraft,npa,credit score,cibil.
-
-    Examples:
-    - What is a home loan?
-    - Explain EMI
-    - What is collateral?
-    - What is CIBIL score?
-    """
-    clean = _normalize(query)
-    key = _match_key(clean, loan_details.keys())
-    if key:
-        return f"topic: {key}\nanswer: {loan_details[key]}"
-    return "Not Found"
+    result = _match_keyword_entry(query, loan_details)
+    if not result:
+        return NOT_FOUND
+    topic, entry = result
+    return f"Topic : {topic.title()}\nAnswer: {entry['answer']}"
 
 
 @tool
-def card_types_faq(query: str):
+def card_types_faq(query: str) -> str:
     """
-    Answers questions related to debit cards,
-    credit cards, RuPay, Visa, Mastercard, etc.
-    examples:
-        what is a debit card?
-        explain credit card
-        what is rupay?
-        tell me about visa card
+    Answer questions about card types: debit card, credit card, RuPay,
+    Visa, Mastercard, prepaid card, virtual card, contactless card.
+
+    Example inputs:
+    - "What is a credit card?"
+    - "Tell me about RuPay"
+    - "What is a contactless card?"
     """
-    clean = _normalize(query)
-    key = _match_key(clean, card_types.keys())
-    if key:
-        return f"topic: {key}\nanswer: {card_types[key]}"
-    return "Not Found"
+    result = _match_keyword_entry(query, card_types)
+    if not result:
+        return NOT_FOUND
+    topic, entry = result
+    return f"Topic : {topic.title()}\nAnswer: {entry['answer']}"
 
 
 @tool
-def general_banking_faq(query: str):
-    """Use this tool for ALL banking definitions like ATM, withdrawal, deposit, interest, loans."""
-    clean = _normalize(query)
+def general_banking_faq(query: str) -> str:
+    """
+    Answer general banking definitions, concepts, terminology, and FAQs.
 
-    # Handle "all" / "faq" intent
-    if "all" in clean.split() or "faq" in clean.split():
-        return general_banking_facts
+    Use this tool whenever the user asks:
 
-    key = _match_key(clean, general_banking_facts.keys())
-    if key:
-        return f"topic: {key}\nanswer: {general_banking_facts[key]}"
-    return "Not found"
+    - What is a bank?
+    - What is banks?
+    - Tell me about banks
+    - What is banking?
+    - Explain ATM
+    - What is deposit?
+    - What is withdrawal?
+    - What is interest?
+    - What is transaction?
+    - What is account?
+    - What is passbook?
+    - What is NEFT?
+    - What is RTGS?
+    - What is IMPS?
+    - What is UPI?
+    - What is KYC?
+    - What is IFSC?
 
+    ALWAYS use this tool for banking definitions,
+    banking terminology, and FAQ-style questions.
+
+    Also accepts:
+    - "faq"
+    - "all"
+    """
+    print('Faqs are called')
+    q = query.lower().strip()
+
+    if q in ("all", "faq"):
+        lines = []
+        for topic, entry in general_banking_facts.items():
+            lines.append(f"{topic.upper()}: {entry['answer']}")
+        return "\n\n".join(lines)
+
+    result = _match_keyword_entry(query, general_banking_facts)
+    if not result:
+        return NOT_FOUND
+    topic, entry = result
+    return f"Topic : {topic.upper()}\nAnswer: {entry['answer']}"

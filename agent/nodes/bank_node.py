@@ -20,4 +20,5 @@ async def banking_node(state):
             "answer": response["output"]
         }
     except Exception as e:
+
         return {"answer":f"Error: failed to generate the answer:'{e}"}
