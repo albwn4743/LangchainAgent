@@ -3,13 +3,11 @@ from memory import full_history
 banking_executor = None
 
 async def initialize_agent():
-
     global banking_executor
-
     banking_executor = await create_base_agent()
 
 async def banking_node(state):
-    banking_executor = await create_base_agent()
+    # banking_executor = await create_base_agent()
     try:
         response = await banking_executor.ainvoke(
             {
@@ -22,5 +20,4 @@ async def banking_node(state):
             "answer": response["output"]
         }
     except Exception as e:
-
         return {"answer":f"Error: failed to generate the answer:'{e}"}

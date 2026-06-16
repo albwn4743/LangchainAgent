@@ -3,7 +3,7 @@ from modelConfig import llm
 from prompt import banking_prompt
 from mcp_client import get_mcp_tools
 from langchain_core.prompts import ChatPromptTemplate,MessagesPlaceholder
-from tools.banking_tools import bank_interest_rates,calculate_emi,bank_names,general_banking_faq,card_types_faq,loan_details_faq
+from tools.banking_tools import bank_interest_rates,bank_names,general_banking_faq,card_types_faq,loan_details_faq
 # from langchain.agents import 
 
 async def create_base_agent():

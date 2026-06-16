@@ -1,4 +1,5 @@
 from langchain_core.tools import tool
+import re
 from knowledge import (
     bank_data,
     banks,
@@ -6,6 +7,19 @@ from knowledge import (
     card_types,
     general_banking_facts,
 )
+def _normalize(text: str) -> str:
+    """Lowercase, strip punctuation, collapse whitespace."""
+    return re.sub(r'\s+', ' ', re.sub(r'[^\w\s]', '', text.lower())).strip()
+
+def _match_key(query_clean: str, keys) -> str | None:
+    """Return the longest key whose words all appear in the query."""
+    for key in sorted(keys, key=len, reverse=True):
+        key_words = key.split()
+        if all(w in query_clean.split() for w in key_words):
+            return key
+    return None
+
+
 
 
 BANK_ALIASES = {
@@ -56,41 +70,7 @@ def bank_interest_rates(bank_name: str)->str:
     f"Bank: {matched_bank}\n"
     f"FD Interest: {data['fixed_deposit_interest']}\n"
     f"Savings Interest: {data['savings_account_interest']}\n"
-    f"Home Loan Interest: {data['home_loan_interest']}"
-)
-
-
-
-@tool
-def calculate_emi(principal: float, annual_rate: float, years: int):
-    """
-    Calculate EMI (Equated Monthly Installment).
-
-    Arguments:
-        principal: Loan amount
-        annual_rate: Annual interest rate in %
-        years: Loan tenure in years
-
-    Example:
-        calculate_emi(1000000, 8.5, 20)
-    """
-
-    rate = annual_rate / (12 * 100)
-    nper = years * 12
-
-    if rate == 0:
-        emi = principal / nper
-    else:
-        emi = principal * rate * (1 + rate) ** nper / ((1 + rate) ** nper - 1)
-
-    return (
-    f"EMI Calculation:\n"
-    f"Principal: {principal}\n"
-    f"Annual Rate: {annual_rate}%\n"
-    f"Years: {years}\n"
-    f"Monthly EMI: {round(emi, 2)}"
-)
-
+    f"Home Loan Interest: {data['home_loan_interest']}")
 
 
 @tool
@@ -103,28 +83,22 @@ def bank_names(query: str):
     - federal
     - kerala
     - indian
+    - list all banks
     """
+    clean = _normalize(query)
 
-    query = query.lower().strip()
-
-    if not query:
+    # Handle "list all" / "show all" intent
+    if not clean or any(w in clean.split() for w in ["all", "list", "show"]):
         return banks
 
-    matches = [
-        bank
-        for bank in banks
-        if query in bank.lower()
-    ]
-
-    if matches:
-        return matches
-
-    return "No matching bank found."
+    matches = [b for b in banks if any(w in b for w in clean.split())]
+    return matches if matches else "No matching bank found."
 
 @tool
 def loan_details_faq(query: str):
     """
     Answers questions related to loans.
+    Trigger words: loan, emi,principal,collateral,mortgage,overdraft,npa,credit score,cibil.
 
     Examples:
     - What is a home loan?
@@ -132,21 +106,11 @@ def loan_details_faq(query: str):
     - What is collateral?
     - What is CIBIL score?
     """
-
-    query = query.lower()
-
-    for key in sorted(
-        loan_details.keys(),
-        key=len,
-        reverse=True
-    ):
-        if key in query:
-            return (
-                f"topic: {key}\n"
-                f"answer: {loan_details[key]}"
-            )
-
-    return 'Not Found'
+    clean = _normalize(query)
+    key = _match_key(clean, loan_details.keys())
+    if key:
+        return f"topic: {key}\nanswer: {loan_details[key]}"
+    return "Not Found"
 
 
 @tool
@@ -154,42 +118,30 @@ def card_types_faq(query: str):
     """
     Answers questions related to debit cards,
     credit cards, RuPay, Visa, Mastercard, etc.
+    examples:
+        what is a debit card?
+        explain credit card
+        what is rupay?
+        tell me about visa card
     """
-
-    query = query.lower()
-
-    for key in sorted(
-        card_types.keys(),
-        key=len,
-        reverse=True
-    ):
-        if key in query:
-            return (
-                f"topic: {key}\n"
-                f"answer: {card_types[key]}\n"
-            )
-
-    return 'Not Found'
+    clean = _normalize(query)
+    key = _match_key(clean, card_types.keys())
+    if key:
+        return f"topic: {key}\nanswer: {card_types[key]}"
+    return "Not Found"
 
 
 @tool
 def general_banking_faq(query: str):
-    '''Use this tool for ALL banking definitions like ATM, withdrawal, deposit, interest, loans.'''
+    """Use this tool for ALL banking definitions like ATM, withdrawal, deposit, interest, loans."""
+    clean = _normalize(query)
 
-    query = query.lower()
-
-    if "all" in query or "faq" in query:
+    # Handle "all" / "faq" intent
+    if "all" in clean.split() or "faq" in clean.split():
         return general_banking_facts
 
-    for key in sorted(
-        general_banking_facts.keys(),
-        key=len,
-        reverse=True
-    ):
-        if key in query or query in key:
-            return (
-                f"topic: {key}\n"
-                f"answer: {general_banking_facts[key]}"
-            )
+    key = _match_key(clean, general_banking_facts.keys())
+    if key:
+        return f"topic: {key}\nanswer: {general_banking_facts[key]}"
+    return "Not found"
 
-    return 'Not found'
